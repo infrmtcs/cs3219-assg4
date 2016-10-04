@@ -19,6 +19,59 @@ function getAuthorUrl(author) {
 	}
 }
 
+function pieChart(data) {
+	var width = 960;
+	var height = 500;
+	var radius = Math.min(width, height) / 2;
+
+	var color = d3.scale.ordinal()
+		.range(["#6cc644", "#3182bd", "#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "#bd2c00", "a05d56"]);
+
+	var arc = d3.svg.arc()
+		.outerRadius(radius - 10)
+		.innerRadius(0);
+
+	var labelArc = d3.svg.arc()
+		.outerRadius(radius - 40)
+		.innerRadius(radius - 40);
+
+	var pie = d3.layout.pie()
+		.sort(function (x, y) {
+			d3.ascending(x.commit, y.commit);
+		})
+		.value(function(d) { return d.commit; });
+
+	d3.select("body")
+		.append("h3")
+		.text("List of contributors by commits")
+
+	var svg = d3.select("body").append("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.append("g")
+		.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+	var g = svg.selectAll(".arc")
+		.data(pie(data))
+		.enter().append("g")
+		.attr("class", "arc");
+
+	g.append("path")
+		.attr("d", arc)
+		.style("fill", function(d) { 
+			return color(d.data.commit); 
+		});
+
+	g.append("text")
+		.attr("transform", function(d) { 
+			return "translate(" + labelArc.centroid(d) + ")"; 
+		})
+		.attr("dy", ".35em")
+		.html(function(d) { 
+			return getAuthorUrl(d.data.author);
+		});
+}
+
 function stackedChart(data) {
 	var editTypes = ["addition", "deletion"];
 
@@ -119,7 +172,7 @@ function query() {
 			data[data.length] = others;
 		}
 		console.log(data);
-		// pieChart(data);
+		pieChart(data);
 		stackedChart(data);
 	});
 }
