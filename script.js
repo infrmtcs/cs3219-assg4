@@ -70,6 +70,15 @@ function pieChart(data) {
 		.html(function(d) { 
 			return getAuthorUrl(d.data.author);
 		});
+
+	g.append("text")
+		.attr("transform", function(d) { 
+			return "translate(" + labelArc.centroid(d) + ")"; 
+		})
+		.attr("dy", "1.5em")
+		.html(function(d) { 
+			return d.data.commit;
+		});
 }
 
 function stackedChart(data) {
